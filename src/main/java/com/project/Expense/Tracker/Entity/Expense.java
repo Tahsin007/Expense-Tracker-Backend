@@ -1,13 +1,11 @@
 package com.project.Expense.Tracker.Entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-import lombok.NonNull;
 import org.springframework.stereotype.Component;
-
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Component
 @Entity
@@ -29,6 +27,7 @@ public class Expense {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @JsonBackReference
     private User user;
 
     @PrePersist

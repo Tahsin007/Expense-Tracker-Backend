@@ -1,5 +1,6 @@
 package com.project.Expense.Tracker.Entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -17,12 +18,14 @@ public class User {
     private Long id;
     @Column(nullable = false)
     @NotNull
-    private String UserName;
+    private String userName;
     @Column(nullable = false)
     @NotNull
     private String password;
     private String email;
+    private List<String> roles;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonBackReference
     private List<Expense> expenses;
 }

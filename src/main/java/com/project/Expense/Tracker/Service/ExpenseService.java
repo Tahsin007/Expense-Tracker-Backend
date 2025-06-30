@@ -1,6 +1,8 @@
 package com.project.Expense.Tracker.Service;
 
 import com.project.Expense.Tracker.Entity.Expense;
+import com.project.Expense.Tracker.Entity.User;
+import com.project.Expense.Tracker.Repository.AuthRepository;
 import com.project.Expense.Tracker.Repository.ExpenseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,11 +16,19 @@ public class ExpenseService {
     @Autowired
     private ExpenseRepository expenseRepository;
 
-    public List<Expense> getAllExpenses(){
-        return expenseRepository.findAll();
+    @Autowired
+    private AuthRepository authRepository;
+
+    @Autowired
+    private UserDetailsServiceImpl userDetailsService;
+
+    public List<Expense> getAllExpenses(String userName){
+        return expenseRepository.findByUser_UserName(userName);
     }
 
-    public Expense saveExpense(Expense expense){
+    public Expense saveExpense(Expense expense, String userName){
+        User user = authRepository.findByUserName(userName);
+        expense.setUser(user);
         return expenseRepository.save(expense);
     }
 
@@ -40,12 +50,21 @@ public class ExpenseService {
         return expenseRepository.findById(id);
     }
 
-    public void deleteAnExpense(Long id){
-        expenseRepository.deleteById(id);
+    public String deleteAnExpense(Long id, String userName){
+        User user = authRepository.findByUserName(userName);
+        Optional<Expense> expenseById = getExpenseById(id);
+        if(expenseById.isPresent() && expenseById.get().getId().equals(user.getId())){
+            expenseRepository.deleteById(id);
+            return "Item is deleted";
+        }else{
+            return "You are not allowed to delete this expense";
+        }
+
+
     }
 
-    public List<Expense> getMonthlyReport(){
-        return expenseRepository.findCurrentMonthExpenses();
+    public List<Object[]> getMonthlyReport(Long id){
+        return expenseRepository.findMonthlyTotalsByUserId(id);
     }
 
     public List<Expense> getCategoryWiseReport(String category){
