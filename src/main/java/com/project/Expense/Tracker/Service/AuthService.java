@@ -18,6 +18,7 @@ public class AuthService {
     private static final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     public User signUpService(User user){
+
         if (!user.getPassword().startsWith("$2a$")) { // BCrypt hashes start with $2a$
             user.setPassword(passwordEncoder.encode(user.getPassword()));
         }

@@ -33,13 +33,12 @@ public class ExpenseService {
     }
 
     public Transaction updateExpenseById(Long id, Transaction oldTransaction){
-        if(oldTransaction !=null && !oldTransaction.getTitle().isEmpty() && !oldTransaction.getAmount().isNaN()){
+        if(oldTransaction !=null){
             Optional<Transaction> newExpense = getExpenseById(id);
             if(newExpense.isPresent()){
-                newExpense.get().setTitle(oldTransaction.getTitle());
                 newExpense.get().setDescription(oldTransaction.getDescription());
                 newExpense.get().setAmount(oldTransaction.getAmount());
-                newExpense.get().setCategory(oldTransaction.getCategory());
+                newExpense.get().setType(oldTransaction.getType());
                 return expenseRepository.save(newExpense.get());
             }
         }
@@ -68,6 +67,6 @@ public class ExpenseService {
     }
 
     public List<Transaction> getCategoryWiseReport(String category){
-        return expenseRepository.findByCategory(category);
+        return expenseRepository.findByCategory_Name(category);
     }
 }

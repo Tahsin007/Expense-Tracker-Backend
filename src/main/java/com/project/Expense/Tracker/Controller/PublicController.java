@@ -3,7 +3,10 @@ package com.project.Expense.Tracker.Controller;
 import com.project.Expense.Tracker.Entity.User;
 import com.project.Expense.Tracker.Service.AuthService;
 import com.project.Expense.Tracker.Service.UserDetailsServiceImpl;
+import com.project.Expense.Tracker.Utils.JwtUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/public")
 @Slf4j
 public class PublicController {
+    private static final Logger log = LoggerFactory.getLogger(PublicController.class);
     @Autowired
     private AuthService authService;
     @Autowired
@@ -23,14 +27,17 @@ public class PublicController {
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
 
+    @Autowired
+    private JwtUtils jwtUtils;
+
     @PostMapping("/sign-in")
     public ResponseEntity<?> signIn(@RequestBody User user){
         try{
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUserName(),user.getPassword()));
             UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUserName());
-//            String jwt = jwtUtils.generateToken(userDetails.getUsername());
+            String jwt = jwtUtils.generateToken(userDetails.getUsername());
             log.info(String.valueOf(userDetails));
-            return new ResponseEntity<>("Sign In Success", HttpStatus.OK);
+            return new ResponseEntity<>("Bearer Token : "+jwt, HttpStatus.OK);
         } catch (Exception e) {
             log.error("Exception occurred while createAuthenticationToken ", e);
             return new ResponseEntity<>("Incorrect username or password", HttpStatus.BAD_REQUEST);

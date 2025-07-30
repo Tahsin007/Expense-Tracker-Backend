@@ -13,7 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/expenses")
-public class ExpenseController {
+public class TransactionController {
     @Autowired
     private ExpenseService expenseService;
 
@@ -26,11 +26,15 @@ public class ExpenseController {
     }
 
     @PostMapping
-    public ResponseEntity<Transaction> addExpense(@RequestBody Transaction transaction){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Transaction transaction1 = expenseService.saveExpense(transaction,authentication.getName());
+    public ResponseEntity<?> addExpense(@RequestBody Transaction transaction){
+        try{
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            Transaction transaction1 = expenseService.saveExpense(transaction,authentication.getName());
+            return new ResponseEntity<>(transaction1,HttpStatus.CREATED);
+        } catch (Exception e){
+            return new ResponseEntity<>("Incorrect username or password", HttpStatus.BAD_REQUEST);
+        }
 
-        return new ResponseEntity<>(transaction1,HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
