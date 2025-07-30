@@ -1,8 +1,10 @@
 package com.project.Expense.Tracker.Entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.springframework.stereotype.Component;
 
@@ -38,6 +40,7 @@ public class User {
     private List<Categories> categoriesList;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private List<Budgets> budgetsList;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)

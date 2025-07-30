@@ -1,5 +1,6 @@
 package com.project.Expense.Tracker.Entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.stereotype.Component;
@@ -26,6 +27,7 @@ public class Budgets {
     // Relationships
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @JsonBackReference
     private User user;
 
 }

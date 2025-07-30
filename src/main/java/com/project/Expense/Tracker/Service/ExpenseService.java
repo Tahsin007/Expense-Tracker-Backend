@@ -2,9 +2,11 @@ package com.project.Expense.Tracker.Service;
 
 import com.project.Expense.Tracker.Entity.Transaction;
 import com.project.Expense.Tracker.Entity.User;
+import com.project.Expense.Tracker.Exception.ApiException;
 import com.project.Expense.Tracker.Repository.AuthRepository;
 import com.project.Expense.Tracker.Repository.ExpenseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -40,9 +42,11 @@ public class ExpenseService {
                 newExpense.get().setAmount(oldTransaction.getAmount());
                 newExpense.get().setType(oldTransaction.getType());
                 return expenseRepository.save(newExpense.get());
+            } else {
+                throw new ApiException("Transaction not found with id: " + id, HttpStatus.NOT_FOUND);
             }
         }
-        return null;
+        throw new ApiException("Invalid transaction data", HttpStatus.BAD_REQUEST);
     }
 
     public Optional<Transaction> getExpenseById(Long id){
@@ -52,11 +56,11 @@ public class ExpenseService {
     public String deleteAnExpense(Long id, String userName){
         User user = authRepository.findByUserName(userName);
         Optional<Transaction> expenseById = getExpenseById(id);
-        if(expenseById.isPresent() && expenseById.get().getId().equals(user.getId())){
+        if(expenseById.isPresent() && expenseById.get().getUser().getId().equals(user.getId())){
             expenseRepository.deleteById(id);
             return "Item is deleted";
         }else{
-            return "You are not allowed to delete this expense";
+            throw new ApiException("You are not authorized to delete this transaction", HttpStatus.UNAUTHORIZED);
         }
 
 

@@ -1,5 +1,6 @@
 package com.project.Expense.Tracker.Controller;
 
+import com.project.Expense.Tracker.Exception.ApiException;
 import com.project.Expense.Tracker.Entity.User;
 import com.project.Expense.Tracker.Service.AuthService;
 import com.project.Expense.Tracker.Service.UserDetailsServiceImpl;
@@ -32,16 +33,14 @@ public class PublicController {
 
     @PostMapping("/sign-in")
     public ResponseEntity<?> signIn(@RequestBody User user){
-        try{
+        try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUserName(),user.getPassword()));
-            UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUserName());
-            String jwt = jwtUtils.generateToken(userDetails.getUsername());
-            log.info(String.valueOf(userDetails));
-            return new ResponseEntity<>("Bearer Token : "+jwt, HttpStatus.OK);
         } catch (Exception e) {
-            log.error("Exception occurred while createAuthenticationToken ", e);
-            return new ResponseEntity<>("Incorrect username or password", HttpStatus.BAD_REQUEST);
+            throw new ApiException("Incorrect username or password", HttpStatus.BAD_REQUEST);
         }
+        UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUserName());
+        String jwt = jwtUtils.generateToken(userDetails.getUsername());
+        return new ResponseEntity<>("Bearer Token : "+jwt, HttpStatus.OK);
     }
 
     @PostMapping("/sign-up")

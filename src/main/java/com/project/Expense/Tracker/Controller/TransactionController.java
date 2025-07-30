@@ -1,6 +1,7 @@
 package com.project.Expense.Tracker.Controller;
 
 import com.project.Expense.Tracker.Entity.Transaction;
+import com.project.Expense.Tracker.Exception.ApiException;
 import com.project.Expense.Tracker.Service.ExpenseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,25 +28,20 @@ public class TransactionController {
 
     @PostMapping
     public ResponseEntity<?> addExpense(@RequestBody Transaction transaction){
-        try{
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            Transaction transaction1 = expenseService.saveExpense(transaction,authentication.getName());
-            return new ResponseEntity<>(transaction1,HttpStatus.CREATED);
-        } catch (Exception e){
-            return new ResponseEntity<>("Incorrect username or password", HttpStatus.BAD_REQUEST);
-        }
-
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Transaction transaction1 = expenseService.saveExpense(transaction,authentication.getName());
+        return new ResponseEntity<>(transaction1,HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
-    public String deleteExpense(@PathVariable Long id){
+    public ResponseEntity<String> deleteExpense(@PathVariable Long id){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return expenseService.deleteAnExpense(id,authentication.getName());
+        return new ResponseEntity<>(expenseService.deleteAnExpense(id,authentication.getName()), HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
-    public Transaction updateExpenseById(@PathVariable Long id, @RequestBody Transaction transaction){
-        return expenseService.updateExpenseById(id, transaction);
+    public ResponseEntity<Transaction> updateExpenseById(@PathVariable Long id, @RequestBody Transaction transaction){
+        return new ResponseEntity<>(expenseService.updateExpenseById(id, transaction), HttpStatus.OK);
     }
 
     @GetMapping("/monthly-report/{id}")
