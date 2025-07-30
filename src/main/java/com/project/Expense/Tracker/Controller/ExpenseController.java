@@ -1,18 +1,15 @@
 package com.project.Expense.Tracker.Controller;
 
-import com.project.Expense.Tracker.Entity.Expense;
+import com.project.Expense.Tracker.Entity.Transaction;
 import com.project.Expense.Tracker.Service.ExpenseService;
-import com.project.Expense.Tracker.Service.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/expenses")
@@ -24,16 +21,16 @@ public class ExpenseController {
     @GetMapping
     public ResponseEntity<?> getAllExpenses(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        List<Expense> allExpenses = expenseService.getAllExpenses(authentication.getName());
-        return new ResponseEntity<>(allExpenses, HttpStatus.OK);
+        List<Transaction> allExpens = expenseService.getAllExpenses(authentication.getName());
+        return new ResponseEntity<>(allExpens, HttpStatus.OK);
     }
 
     @PostMapping
-    public ResponseEntity<Expense> addExpense(@RequestBody Expense  expense){
+    public ResponseEntity<Transaction> addExpense(@RequestBody Transaction transaction){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Expense expense1 = expenseService.saveExpense(expense,authentication.getName());
+        Transaction transaction1 = expenseService.saveExpense(transaction,authentication.getName());
 
-        return new ResponseEntity<>(expense1,HttpStatus.CREATED);
+        return new ResponseEntity<>(transaction1,HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
@@ -43,8 +40,8 @@ public class ExpenseController {
     }
 
     @PutMapping("/{id}")
-    public Expense updateExpenseById(@PathVariable Long id, @RequestBody Expense expense){
-        return expenseService.updateExpenseById(id,expense);
+    public Transaction updateExpenseById(@PathVariable Long id, @RequestBody Transaction transaction){
+        return expenseService.updateExpenseById(id, transaction);
     }
 
     @GetMapping("/monthly-report/{id}")
@@ -53,7 +50,7 @@ public class ExpenseController {
     }
 
     @GetMapping("/category-report/{category}")
-    public ResponseEntity<List<Expense>> getCategoryWiseReport(@PathVariable String category) {
+    public ResponseEntity<List<Transaction>> getCategoryWiseReport(@PathVariable String category) {
         return ResponseEntity.ok(expenseService.getCategoryWiseReport(category));
     }
 
