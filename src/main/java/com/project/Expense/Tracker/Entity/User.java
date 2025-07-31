@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.antlr.v4.runtime.misc.NotNull;
 import org.springframework.stereotype.Component;
 
@@ -16,6 +17,7 @@ import java.util.List;
 @Entity
 @Table(name = "`user`")
 @Data
+@ToString(exclude = {"transactionsList", "categoriesList", "budgetsList", "recurringTransactionsList"})
 public class User {
     @Id
     @GeneratedValue
@@ -37,6 +39,7 @@ public class User {
     private List<Transaction> transactionsList;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+//    @JsonManagedReference
     private List<Categories> categoriesList;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
