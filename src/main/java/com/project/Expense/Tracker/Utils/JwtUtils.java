@@ -3,6 +3,7 @@ package com.project.Expense.Tracker.Utils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -23,6 +24,14 @@ public class JwtUtils {
         return claims.getSubject();
     }
 
+    public Long extractUserId(String token) {
+        return extractAllClaims(token).get("id", Long.class);
+    }
+
+    public String extractEmail(String token) {
+        return extractAllClaims(token).get("email", String.class);
+    }
+
     public Date extractExpiration(String token) {
         return extractAllClaims(token).getExpiration();
     }
@@ -39,9 +48,9 @@ public class JwtUtils {
         return extractExpiration(token).before(new Date());
     }
 
-    public String generateToken(String username) {
+    public String generateToken(UserDetails user) {
         Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, username);
+        return createToken(claims, user.getUsername());
     }
 
     private String createToken(Map<String, Object> claims, String subject) {

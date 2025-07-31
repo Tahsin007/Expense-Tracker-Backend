@@ -36,10 +36,11 @@ public class PublicController {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUserName(),user.getPassword()));
         } catch (Exception e) {
+            log.info("User Name : "+user.getUserName());
             throw new ApiException("Incorrect username or password", HttpStatus.BAD_REQUEST);
         }
         UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUserName());
-        String jwt = jwtUtils.generateToken(userDetails.getUsername());
+        String jwt = jwtUtils.generateToken(userDetails);
         return new ResponseEntity<>("Bearer Token : "+jwt, HttpStatus.OK);
     }
 
