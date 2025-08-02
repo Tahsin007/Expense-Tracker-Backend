@@ -5,6 +5,9 @@ import com.project.Expense.Tracker.Entity.User;
 import com.project.Expense.Tracker.Service.AuthService;
 import com.project.Expense.Tracker.Service.UserDetailsServiceImpl;
 import com.project.Expense.Tracker.Utils.JwtUtils;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/public")
 @Slf4j
+@Tag(name = "Public Controller", description = "APIs for user authentication")
 public class PublicController {
     private static final Logger log = LoggerFactory.getLogger(PublicController.class);
     @Autowired
@@ -31,6 +35,14 @@ public class PublicController {
     @Autowired
     private JwtUtils jwtUtils;
 
+    @Operation(
+            description = "Authenticate user and generate JWT token.",
+            summary = "User Sign-In",
+            responses = {
+                    @ApiResponse(description = "Authentication successful, JWT token generated", responseCode = "200"),
+                    @ApiResponse(description = "Incorrect username or password", responseCode = "400")
+            }
+    )
     @PostMapping("/sign-in")
     public ResponseEntity<?> signIn(@RequestBody User user){
         try {
@@ -44,6 +56,13 @@ public class PublicController {
         return new ResponseEntity<>("Bearer Token : "+jwt, HttpStatus.OK);
     }
 
+    @Operation(
+            description = "Register a new user.",
+            summary = "User Sign-Up",
+            responses = {
+                    @ApiResponse(description = "User registered successfully", responseCode = "200")
+            }
+    )
     @PostMapping("/sign-up")
     public User signUp(@RequestBody User user){
         return authService.signUpService(user);
