@@ -21,5 +21,5 @@ RUN mvn clean package -DskipTests
 FROM openjdk:17-jdk
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-Dserver.port=$PORT", "-jar", "app.jar"]
 
