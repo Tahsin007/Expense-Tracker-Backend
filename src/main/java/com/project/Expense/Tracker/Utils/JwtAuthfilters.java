@@ -1,5 +1,6 @@
 package com.project.Expense.Tracker.Utils;
 
+import com.project.Expense.Tracker.Repository.BlacklistedTokenRepository;
 import com.project.Expense.Tracker.Service.UserDetailsServiceImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -22,23 +23,38 @@ public class JwtAuthfilters extends OncePerRequestFilter {
 
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
+
+    @Autowired
+    private BlacklistedTokenRepository blacklistedTokenRepository;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String authorizationHeader = request.getHeader("Authorization");
         String userName = null;
         String jwt = null;
 
-        if(authorizationHeader != null && authorizationHeader.startsWith("Bearer ")){
-            jwt = authorizationHeader.substring(7);
-            userName = jwtUtils.extractUsername(jwt);
+        if (authorizationHeader != null) {
+            if (authorizationHeader.toLowerCase().startsWith("bearer ")) {
+                jwt = authorizationHeader.substring(7);
+            } else {
+                jwt = authorizationHeader;
+            }
+            try {
+                userName = jwtUtils.extractUsername(jwt);
+            } catch (Exception e) {
+                // Malformed token, proceed without authentication
+            }
         }
 
         if(userName !=null && jwtUtils.validateToken(jwt)) {
-            var userDetails = userDetailsService.loadUserByUsername(userName);
-            var authentication = new UsernamePasswordAuthenticationToken(
-                    userDetails, null, userDetails.getAuthorities());
-            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            boolean isTokenBlacklisted = blacklistedTokenRepository.findByToken(jwt).isPresent();
+            if (!isTokenBlacklisted) {
+                var userDetails = userDetailsService.loadUserByUsername(userName);
+                var authentication = new UsernamePasswordAuthenticationToken(
+                        userDetails, null, userDetails.getAuthorities());
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
         }
         filterChain.doFilter(request,response);
     }

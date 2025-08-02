@@ -32,7 +32,14 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .addFilterBefore(jwtAuthFilterl, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/public/**").permitAll()   // allow public endpoints
+                        .requestMatchers(
+                                "/public/**",
+                                "/swagger-ui.html",
+                                "/swagger-ui/**",
+                                "/api-docs",
+                                "/api-docs/**",
+                                "/v3/api-docs/**"
+                        ).permitAll()   // allow public endpoints
                         .anyRequest().authenticated()               // secure all others
                 )
                 .httpBasic(Customizer.withDefaults()); // default login page

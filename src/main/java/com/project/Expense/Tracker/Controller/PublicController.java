@@ -53,7 +53,7 @@ public class PublicController {
         }
         UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUserName());
         String jwt = jwtUtils.generateToken(userDetails);
-        return new ResponseEntity<>("Bearer Token : "+jwt, HttpStatus.OK);
+        return new ResponseEntity<>(jwt, HttpStatus.OK);
     }
 
     @Operation(
@@ -66,5 +66,29 @@ public class PublicController {
     @PostMapping("/sign-up")
     public User signUp(@RequestBody User user){
         return authService.signUpService(user);
+    }
+
+    @Operation(
+            description = "Logout user and invalidate JWT token.",
+            summary = "User Logout",
+            responses = {
+                    @ApiResponse(description = "Logout successful", responseCode = "200")
+            }
+    )
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestHeader("Authorization") String authorizationHeader) {
+        if (authorizationHeader == null) {
+            return new ResponseEntity<>("Authorization header is missing", HttpStatus.BAD_REQUEST);
+        }
+
+        String jwt;
+        if (authorizationHeader.toLowerCase().startsWith("bearer ")) {
+            jwt = authorizationHeader.substring(7);
+        } else {
+            jwt = authorizationHeader;
+        }
+
+        authService.logout(jwt);
+        return new ResponseEntity<>("Logout successful", HttpStatus.OK);
     }
 }
