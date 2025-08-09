@@ -1,5 +1,7 @@
 package com.project.Expense.Tracker.Service;
 
+import com.project.Expense.Tracker.Entity.CategoryType;
+import com.project.Expense.Tracker.Entity.DTO.RecurringTransactionSummaryDTO;
 import com.project.Expense.Tracker.Entity.RecurringTransactions;
 import com.project.Expense.Tracker.Entity.User;
 import com.project.Expense.Tracker.Exception.ApiException;
@@ -10,8 +12,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class RecurringTransactionService {
@@ -37,6 +41,9 @@ public class RecurringTransactionService {
     public RecurringTransactions createRecurringTransaction(RecurringTransactions recurringTransaction) {
         User user = getCurrentUser();
         recurringTransaction.setUser(user);
+        if (!recurringTransaction.isActive()) {
+            recurringTransaction.setActive(true);
+        }
         return recurringTransactionRepository.save(recurringTransaction);
     }
 
@@ -55,6 +62,8 @@ public class RecurringTransactionService {
         existingTransaction.setNextOccurrence(updatedTransaction.getNextOccurrence());
         existingTransaction.setFrequency(updatedTransaction.getFrequency());
         existingTransaction.setCategory(updatedTransaction.getCategory());
+        existingTransaction.setActive(updatedTransaction.isActive());
+        existingTransaction.setMaxOccurrences(updatedTransaction.getMaxOccurrences());
 
         return recurringTransactionRepository.save(existingTransaction);
     }
@@ -78,6 +87,27 @@ public class RecurringTransactionService {
     public List<RecurringTransactions> getOverdueTransactions() {
         User user = getCurrentUser();
         return recurringTransactionRepository.findByUserAndNextOccurrenceBeforeAndEndDateAfter(user, LocalDate.now(), LocalDate.now());
+    }
+
+    public RecurringTransactionSummaryDTO getRecurringTransactionSummary(int year, int month) {
+        User user = getCurrentUser();
+        List<RecurringTransactions> recurringTransactions = recurringTransactionRepository.findAllByUser(user);
+
+        BigDecimal totalIncome = BigDecimal.ZERO;
+        BigDecimal totalExpense = BigDecimal.ZERO;
+
+        for (RecurringTransactions transaction : recurringTransactions) {
+            LocalDate nextOccurrence = transaction.getNextOccurrence();
+            if (nextOccurrence.getYear() == year && nextOccurrence.getMonthValue() == month) {
+                if (Objects.equals(transaction.getType(), "INCOME")) {
+                    totalIncome = totalIncome.add(transaction.getAmount());
+                } else if (Objects.equals(transaction.getType(), "EXPENSE")) {
+                    totalExpense = totalExpense.add(transaction.getAmount());
+                }
+            }
+        }
+
+        return new RecurringTransactionSummaryDTO(totalIncome, totalExpense);
     }
 
     private User getCurrentUser() {

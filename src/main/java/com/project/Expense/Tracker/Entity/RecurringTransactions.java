@@ -24,6 +24,8 @@ public class RecurringTransactions {
     private LocalDate startDate;
     private LocalDate endDate;
     private LocalDate nextOccurrence;
+    private boolean isActive = true;
+    private Integer maxOccurrences;
 
     // Relationships
     @ManyToOne

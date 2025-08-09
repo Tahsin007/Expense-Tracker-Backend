@@ -1,5 +1,6 @@
 package com.project.Expense.Tracker.Controller;
 
+import com.project.Expense.Tracker.Entity.DTO.RecurringTransactionSummaryDTO;
 import com.project.Expense.Tracker.Entity.RecurringTransactions;
 import com.project.Expense.Tracker.Service.RecurringTransactionService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -103,5 +104,18 @@ public class RecurringTransactionController {
     @GetMapping("/overdue")
     public ResponseEntity<List<RecurringTransactions>> getOverdueTransactions() {
         return new ResponseEntity<>(recurringTransactionService.getOverdueTransactions(), HttpStatus.OK);
+    }
+
+    @Operation(
+            description = "Get recurring transaction summary for a given month and year",
+            summary = "Get recurring transaction summary",
+            responses = {
+                    @ApiResponse(description = "Success", responseCode = "200")
+            }
+    )
+    @GetMapping("/summary")
+    public ResponseEntity<RecurringTransactionSummaryDTO> getRecurringTransactionSummary(
+            @RequestParam int year, @RequestParam int month) {
+        return new ResponseEntity<>(recurringTransactionService.getRecurringTransactionSummary(year, month), HttpStatus.OK);
     }
 }

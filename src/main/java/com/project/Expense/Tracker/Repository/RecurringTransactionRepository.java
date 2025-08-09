@@ -12,6 +12,8 @@ import java.util.List;
 public interface RecurringTransactionRepository extends JpaRepository<RecurringTransactions, Long> {
     List<RecurringTransactions> findByUserId(Long userId);
 
+    List<RecurringTransactions> findAllByUser(User user);
+
     List<RecurringTransactions> findByUserAndNextOccurrenceAfter(User user, LocalDate date);
 
     List<RecurringTransactions> findByUserAndNextOccurrenceBeforeAndEndDateAfter(User user, LocalDate date, LocalDate endDate);
