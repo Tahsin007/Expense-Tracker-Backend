@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/recurring")
+@RequestMapping("/recurring-transactions")
 @Tag(name = "Recurring Transaction Controller", description = "APIs for managing recurring transactions")
 public class RecurringTransactionController {
 
@@ -21,8 +21,20 @@ public class RecurringTransactionController {
     private RecurringTransactionService recurringTransactionService;
 
     @Operation(
-            description = "Get all recurring transactions.",
-            summary = "Get All Recurring Transactions",
+            description = "Create a new recurring transaction",
+            summary = "Create a new recurring transaction",
+            responses = {
+                    @ApiResponse(description = "Success", responseCode = "201")
+            }
+    )
+    @PostMapping
+    public ResponseEntity<RecurringTransactions> createRecurringTransaction(@RequestBody RecurringTransactions recurringTransaction) {
+        return new ResponseEntity<>(recurringTransactionService.createRecurringTransaction(recurringTransaction), HttpStatus.CREATED);
+    }
+
+    @Operation(
+            description = "Get all recurring transactions for logged-in user",
+            summary = "Get all recurring transactions for logged-in user",
             responses = {
                     @ApiResponse(description = "Success", responseCode = "200")
             }
@@ -33,8 +45,8 @@ public class RecurringTransactionController {
     }
 
     @Operation(
-            description = "Get a recurring transaction by its ID.",
-            summary = "Get Recurring Transaction by ID",
+            description = "Get details of a specific recurring transaction",
+            summary = "Get details of a specific recurring transaction",
             responses = {
                     @ApiResponse(description = "Success", responseCode = "200")
             }
@@ -45,22 +57,10 @@ public class RecurringTransactionController {
     }
 
     @Operation(
-            description = "Create a new recurring transaction.",
-            summary = "Create Recurring Transaction",
+            description = "Update a recurring transaction",
+            summary = "Update a recurring transaction",
             responses = {
-                    @ApiResponse(description = "Recurring transaction created successfully", responseCode = "201")
-            }
-    )
-    @PostMapping
-    public ResponseEntity<RecurringTransactions> createRecurringTransaction(@RequestBody RecurringTransactions recurringTransaction) {
-        return new ResponseEntity<>(recurringTransactionService.createRecurringTransaction(recurringTransaction), HttpStatus.CREATED);
-    }
-
-    @Operation(
-            description = "Update an existing recurring transaction.",
-            summary = "Update Recurring Transaction",
-            responses = {
-                    @ApiResponse(description = "Recurring transaction updated successfully", responseCode = "200")
+                    @ApiResponse(description = "Success", responseCode = "200")
             }
     )
     @PutMapping("/{id}")
@@ -69,15 +69,39 @@ public class RecurringTransactionController {
     }
 
     @Operation(
-            description = "Delete a recurring transaction by its ID.",
-            summary = "Delete Recurring Transaction",
+            description = "Delete a recurring transaction",
+            summary = "Delete a recurring transaction",
             responses = {
-                    @ApiResponse(description = "Recurring transaction deleted successfully", responseCode = "204")
+                    @ApiResponse(description = "Success", responseCode = "204")
             }
     )
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteRecurringTransaction(@PathVariable Long id) {
         recurringTransactionService.deleteRecurringTransaction(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @Operation(
+            description = "Get upcoming payments (next_occurrence in future)",
+            summary = "Get upcoming payments",
+            responses = {
+                    @ApiResponse(description = "Success", responseCode = "200")
+            }
+    )
+    @GetMapping("/upcoming")
+    public ResponseEntity<List<RecurringTransactions>> getUpcomingTransactions() {
+        return new ResponseEntity<>(recurringTransactionService.getUpcomingTransactions(), HttpStatus.OK);
+    }
+
+    @Operation(
+            description = "Get overdue payments (next_occurrence < today & still active)",
+            summary = "Get overdue payments",
+            responses = {
+                    @ApiResponse(description = "Success", responseCode = "200")
+            }
+    )
+    @GetMapping("/overdue")
+    public ResponseEntity<List<RecurringTransactions>> getOverdueTransactions() {
+        return new ResponseEntity<>(recurringTransactionService.getOverdueTransactions(), HttpStatus.OK);
     }
 }

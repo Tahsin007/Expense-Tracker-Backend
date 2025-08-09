@@ -1,6 +1,7 @@
 package com.project.Expense.Tracker.Entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.stereotype.Component;
@@ -27,9 +28,11 @@ public class RecurringTransactions {
     // Relationships
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @JsonIgnore
     private User user;
 
     @ManyToOne
     @JoinColumn(name = "category_id")
+    @JsonIgnore
     private Categories category;
 }

@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -67,6 +68,16 @@ public class RecurringTransactionService {
         }
 
         recurringTransactionRepository.deleteById(id);
+    }
+
+    public List<RecurringTransactions> getUpcomingTransactions() {
+        User user = getCurrentUser();
+        return recurringTransactionRepository.findByUserAndNextOccurrenceAfter(user, LocalDate.now());
+    }
+
+    public List<RecurringTransactions> getOverdueTransactions() {
+        User user = getCurrentUser();
+        return recurringTransactionRepository.findByUserAndNextOccurrenceBeforeAndEndDateAfter(user, LocalDate.now(), LocalDate.now());
     }
 
     private User getCurrentUser() {
