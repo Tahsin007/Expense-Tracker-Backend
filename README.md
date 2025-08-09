@@ -51,6 +51,10 @@ A comprehensive and robust RESTful API for managing personal finances. This back
 ├───pom.xml                         # Maven project configuration
 └───README.md
 ```
+## 🗃️ Database Schema
+
+<img width="1232" height="806" alt="Image" src="https://github.com/user-attachments/assets/99044c9b-dee3-497a-b8b0-91c084752155" />
+
 
 ## 🚀 Getting Started
 
