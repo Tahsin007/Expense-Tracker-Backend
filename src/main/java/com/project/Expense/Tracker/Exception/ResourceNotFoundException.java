@@ -1,6 +1,7 @@
 package com.project.Expense.Tracker.Exception;
 
 public class ResourceNotFoundException extends RuntimeException {
-    public ResourceNotFoundException(String budgetNotFound) {
+    public ResourceNotFoundException(String message) {
+        super(message);
     }
 }

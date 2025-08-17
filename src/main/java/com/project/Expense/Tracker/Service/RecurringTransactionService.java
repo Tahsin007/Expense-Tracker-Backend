@@ -1,10 +1,11 @@
 package com.project.Expense.Tracker.Service;
 
-import com.project.Expense.Tracker.Entity.CategoryType;
 import com.project.Expense.Tracker.Entity.DTO.RecurringTransactionSummaryDTO;
 import com.project.Expense.Tracker.Entity.RecurringTransactions;
 import com.project.Expense.Tracker.Entity.User;
-import com.project.Expense.Tracker.Exception.ApiException;
+import com.project.Expense.Tracker.Exception.ApiErrorResponse;
+import com.project.Expense.Tracker.Exception.ResourceNotFoundException;
+import com.project.Expense.Tracker.Exception.UnauthorizedAccessEcxception;
 import com.project.Expense.Tracker.Repository.AuthRepository;
 import com.project.Expense.Tracker.Repository.RecurringTransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,7 @@ public class RecurringTransactionService {
         User user = getCurrentUser();
         return recurringTransactionRepository.findById(id)
                 .filter(transaction -> transaction.getUser().getId().equals(user.getId()))
-                .orElseThrow(() -> new ApiException("Recurring transaction not found or access denied", HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResourceNotFoundException("Recurring transaction not found or access denied"));
     }
 
     public RecurringTransactions createRecurringTransaction(RecurringTransactions recurringTransaction) {
@@ -52,7 +53,7 @@ public class RecurringTransactionService {
         RecurringTransactions existingTransaction = getRecurringTransactionById(id);
 
         if (!existingTransaction.getUser().getId().equals(user.getId())) {
-            throw new ApiException("You are not authorized to update this transaction", HttpStatus.UNAUTHORIZED);
+            throw new UnauthorizedAccessEcxception("You are not authorized to update this transaction");
         }
 
         existingTransaction.setAmount(updatedTransaction.getAmount());
@@ -73,7 +74,7 @@ public class RecurringTransactionService {
         RecurringTransactions transaction = getRecurringTransactionById(id);
 
         if (!transaction.getUser().getId().equals(user.getId())) {
-            throw new ApiException("You are not authorized to delete this transaction", HttpStatus.UNAUTHORIZED);
+            throw new UnauthorizedAccessEcxception("You are not authorized to delete this transaction");
         }
 
         recurringTransactionRepository.deleteById(id);
@@ -114,7 +115,7 @@ public class RecurringTransactionService {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = authRepository.findByUserName(username);
         if (user == null) {
-            throw new ApiException("User not found", HttpStatus.NOT_FOUND);
+            throw new ResourceNotFoundException("User Not Found");
         }
         return user;
     }

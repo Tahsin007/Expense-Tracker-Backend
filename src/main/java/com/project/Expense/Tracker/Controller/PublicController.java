@@ -1,7 +1,8 @@
 package com.project.Expense.Tracker.Controller;
 
-import com.project.Expense.Tracker.Exception.ApiException;
+import com.project.Expense.Tracker.Exception.ApiErrorResponse;
 import com.project.Expense.Tracker.Entity.User;
+import com.project.Expense.Tracker.Exception.ResourceNotFoundException;
 import com.project.Expense.Tracker.Service.AuthService;
 import com.project.Expense.Tracker.Service.UserDetailsServiceImpl;
 import com.project.Expense.Tracker.Utils.JwtUtils;
@@ -49,7 +50,7 @@ public class PublicController {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUserName(),user.getPassword()));
         } catch (Exception e) {
             log.info("User Name : "+user.getUserName());
-            throw new ApiException("Incorrect username or password", HttpStatus.BAD_REQUEST);
+            throw new ResourceNotFoundException("Username or password incorrect");
         }
         UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUserName());
         String jwt = jwtUtils.generateToken(userDetails);

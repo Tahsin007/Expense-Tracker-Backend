@@ -4,7 +4,10 @@ import com.project.Expense.Tracker.Entity.Categories;
 import com.project.Expense.Tracker.Entity.DTO.TransactionRequest;
 import com.project.Expense.Tracker.Entity.Transaction;
 import com.project.Expense.Tracker.Entity.User;
-import com.project.Expense.Tracker.Exception.ApiException;
+import com.project.Expense.Tracker.Exception.ApiErrorResponse;
+import com.project.Expense.Tracker.Exception.RequestBodyException;
+import com.project.Expense.Tracker.Exception.ResourceNotFoundException;
+import com.project.Expense.Tracker.Exception.UnauthorizedAccessEcxception;
 import com.project.Expense.Tracker.Repository.AuthRepository;
 import com.project.Expense.Tracker.Repository.CategoryRepository;
 import com.project.Expense.Tracker.Repository.TransactionRepository;
@@ -42,7 +45,7 @@ public class TransactionService {
     public Transaction saveTransaction(TransactionRequest request, String userName){
         User user = authRepository.findByUserName(userName);
         Categories category = categoryRepository.findById(request.getCategoryId())
-                .orElseThrow(() -> new RuntimeException("Category not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found for the user"));
 
         Transaction transaction = new Transaction();
         transaction.setUser(user);
@@ -57,12 +60,13 @@ public class TransactionService {
 
     public Transaction updateTransactionById(Long id, TransactionRequest updatedTransaction){
         if (updatedTransaction == null) {
-            throw new ApiException("Invalid transaction data", HttpStatus.BAD_REQUEST);
+            throw new RequestBodyException("Please provide a correct request body");
         }
         Categories category = categoryRepository.findById(updatedTransaction.getCategoryId()).orElseThrow();
 
         Transaction existingTransaction = transactionRepository.findById(id)
-                .orElseThrow(() -> new ApiException("Transaction not found with id: " + id, HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResourceNotFoundException("Transaction not found with id: " + id));
+
 
         existingTransaction.setDescription(updatedTransaction.getDescription());
         existingTransaction.setAmount(updatedTransaction.getAmount());
@@ -83,7 +87,7 @@ public class TransactionService {
             transactionRepository.deleteById(id);
             return "Item is deleted";
         }else{
-            throw new ApiException("You are not authorized to delete this transaction", HttpStatus.UNAUTHORIZED);
+            throw new UnauthorizedAccessEcxception("You are not authorized to delete this item");
         }
 
 

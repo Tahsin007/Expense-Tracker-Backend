@@ -3,6 +3,7 @@ package com.project.Expense.Tracker.Service;
 import com.project.Expense.Tracker.Entity.Budgets;
 import com.project.Expense.Tracker.Entity.User;
 import com.project.Expense.Tracker.Exception.ResourceNotFoundException;
+import com.project.Expense.Tracker.Exception.UnauthorizedAccessEcxception;
 import com.project.Expense.Tracker.Repository.AuthRepository;
 import com.project.Expense.Tracker.Repository.BudgetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +51,7 @@ public class BudgetService {
                 .orElseThrow(() -> new ResourceNotFoundException("Budget not found"));
 
         if (!budget.getUser().getId().equals(user.getId())) {
-            throw new AccessDeniedException("You are not allowed to update this budget.");
+            throw new UnauthorizedAccessEcxception("You are not allowed to update this budget.");
         }
 
         budget.setAmount(updatedBudget.getAmount());
@@ -65,7 +66,7 @@ public class BudgetService {
                 .orElseThrow(() -> new ResourceNotFoundException("Budget not found"));
 
         if (!budget.getUser().getId().equals(userId)) {
-            throw new AccessDeniedException("You are not allowed to delete this budget.");
+            throw new UnauthorizedAccessEcxception("You are not allowed to delete this budget.");
         }
 
         budgetRepository.delete(budget);

@@ -2,6 +2,8 @@ package com.project.Expense.Tracker.Service;
 
 import com.project.Expense.Tracker.Entity.Categories;
 import com.project.Expense.Tracker.Entity.User;
+import com.project.Expense.Tracker.Exception.ResourceNotFoundException;
+import com.project.Expense.Tracker.Exception.UnauthorizedAccessEcxception;
 import com.project.Expense.Tracker.Repository.AuthRepository;
 import com.project.Expense.Tracker.Repository.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,10 +40,10 @@ public class CategoryService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = authRepository.findByUserName(authentication.getName());
         Categories category = categoryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Category not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
 
         if (!category.getUser().getId().equals(user.getId())) {
-            throw new RuntimeException("Unauthorized to update this category");
+            throw new UnauthorizedAccessEcxception("Unauthorized to update this category");
         }
         category.setName(categoryDetails.getName());
         category.setIcon(categoryDetails.getIcon());
@@ -54,10 +56,10 @@ public class CategoryService {
         User user = authRepository.findByUserName(authentication.getName());
 
         Categories category = categoryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Category not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found"));
 
         if (!category.getUser().getId().equals(user.getId())) {
-            throw new RuntimeException("Unauthorized to delete this category");
+            throw new UnauthorizedAccessEcxception("Unauthorized to update this category");
         }
 
         categoryRepository.delete(category);
