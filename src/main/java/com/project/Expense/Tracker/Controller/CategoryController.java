@@ -23,79 +23,28 @@ public class CategoryController {
     @Autowired
     private CategoryService categoryService;
 
-    @Operation(
-            description = "Get all available categories.",
-            summary = "Get All Categories",
-            responses = {
-                    @ApiResponse(description = "Success", responseCode = "200"),
-                    @ApiResponse(description = "Categories not found", responseCode = "404")
-            }
-    )
     @GetMapping
     public ResponseEntity<?> getAllCategories() {
-        try{
-            Optional<List<Categories>> allCategories = categoryService.getAllCategories();
-            log.info(allCategories.toString());
-            if(allCategories.isPresent()){
-                return new ResponseEntity<>(allCategories, HttpStatus.OK);
-            }
-            return new ResponseEntity<>("Categories data not available", HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.toString(),HttpStatus.BAD_REQUEST);
-        }
+        Optional<List<Categories>> allCategories = categoryService.getAllCategories();
+        log.info(allCategories.toString());
+        return new ResponseEntity<>(allCategories, HttpStatus.OK);
     }
 
-    @Operation(
-            description = "Create a new category.",
-            summary = "Create Category",
-            responses = {
-                    @ApiResponse(description = "Category created successfully", responseCode = "201"),
-                    @ApiResponse(description = "Bad request", responseCode = "400")
-            }
-    )
     @PostMapping
     public ResponseEntity<?> createCategory(@RequestBody Categories category) {
-        try{
-            Categories category1 = categoryService.createCategory(category);
-            return new ResponseEntity<>(category1,HttpStatus.CREATED);
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.toString(),HttpStatus.BAD_REQUEST);
-        }
+        Categories category1 = categoryService.createCategory(category);
+        return new ResponseEntity<>(category1,HttpStatus.CREATED);
     }
 
-    @Operation(
-            description = "Update an existing category.",
-            summary = "Update Category",
-            responses = {
-                    @ApiResponse(description = "Category updated successfully", responseCode = "200"),
-                    @ApiResponse(description = "Bad request", responseCode = "400")
-            }
-    )
     @PutMapping("/{id}")
     public ResponseEntity<?> updateCategory(@PathVariable Long id, @RequestBody Categories categoryDetails) {
-        try{
-            Categories categories = categoryService.updateCategory(id, categoryDetails);
-            return new ResponseEntity<>(categories, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.toString(),HttpStatus.BAD_REQUEST);
-        }
+        Categories categories = categoryService.updateCategory(id, categoryDetails);
+        return new ResponseEntity<>(categories, HttpStatus.OK);
     }
 
-    @Operation(
-            description = "Delete a category by its ID.",
-            summary = "Delete Category",
-            responses = {
-                    @ApiResponse(description = "Category deleted successfully", responseCode = "200"),
-                    @ApiResponse(description = "Bad request", responseCode = "400")
-            }
-    )
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteCategory(@PathVariable Long id) {
-        try{
-            categoryService.deleteCategory(id);
-            return new ResponseEntity<>("Category Deleted Successfully",HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.toString(),HttpStatus.BAD_REQUEST);
-        }
+        categoryService.deleteCategory(id);
+        return new ResponseEntity<>("Category Deleted Successfully",HttpStatus.OK);
     }
 }

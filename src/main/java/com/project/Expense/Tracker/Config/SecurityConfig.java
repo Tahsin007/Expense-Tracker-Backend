@@ -1,4 +1,4 @@
-package com.project.Expense.Tracker.Security;
+package com.project.Expense.Tracker.Config;
 
 import com.project.Expense.Tracker.Service.UserDetailsServiceImpl;
 import com.project.Expense.Tracker.Utils.JwtAuthfilters;

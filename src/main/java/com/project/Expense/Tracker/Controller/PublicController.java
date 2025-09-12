@@ -36,14 +36,6 @@ public class PublicController {
     @Autowired
     private JwtUtils jwtUtils;
 
-    @Operation(
-            description = "Authenticate user and generate JWT token.",
-            summary = "User Sign-In",
-            responses = {
-                    @ApiResponse(description = "Authentication successful, JWT token generated", responseCode = "200"),
-                    @ApiResponse(description = "Incorrect username or password", responseCode = "400")
-            }
-    )
     @PostMapping("/sign-in")
     public ResponseEntity<?> signIn(@RequestBody User user){
         try {
@@ -57,25 +49,11 @@ public class PublicController {
         return new ResponseEntity<>(jwt, HttpStatus.OK);
     }
 
-    @Operation(
-            description = "Register a new user.",
-            summary = "User Sign-Up",
-            responses = {
-                    @ApiResponse(description = "User registered successfully", responseCode = "200")
-            }
-    )
     @PostMapping("/sign-up")
     public User signUp(@RequestBody User user){
         return authService.signUpService(user);
     }
 
-    @Operation(
-            description = "Logout user and invalidate JWT token.",
-            summary = "User Logout",
-            responses = {
-                    @ApiResponse(description = "Logout successful", responseCode = "200")
-            }
-    )
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@RequestHeader("Authorization") String authorizationHeader) {
         if (authorizationHeader == null) {

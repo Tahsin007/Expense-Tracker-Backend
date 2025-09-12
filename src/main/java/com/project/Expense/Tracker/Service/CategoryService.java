@@ -26,7 +26,12 @@ public class CategoryService {
     public Optional<List<Categories>> getAllCategories() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = authRepository.findByUserName(authentication.getName());
-        return categoryRepository.findByUser_Id(user.getId());
+        Optional<List<Categories>> categories = categoryRepository.findByUser_Id(user.getId());
+        if(categories.isPresent()){
+            return categories;
+        }else{
+            throw new ResourceNotFoundException("Categories data not available");
+        }
     }
 
     public Categories createCategory(Categories category) {
