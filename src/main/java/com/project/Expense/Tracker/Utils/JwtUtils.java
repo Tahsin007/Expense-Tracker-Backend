@@ -50,16 +50,23 @@ public class JwtUtils {
 
     public String generateToken(UserDetails user) {
         Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, user.getUsername());
+        Date expiryDate = new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24);
+        return createToken(claims, user.getUsername(),expiryDate);
+    }
+    public String generateRefreshToken(UserDetails user){
+        Map<String, Object> claims = new HashMap<>();
+        Date expiryDate = new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 7);
+        return createToken(claims,user.getUsername(),expiryDate);
     }
 
-    private String createToken(Map<String, Object> claims, String subject) {
+
+    private String createToken(Map<String, Object> claims, String subject,Date expiryDate) {
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(subject)
                 .setHeaderParam("typ","JWT")
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24)) // 24 hours expiration time
+                .setExpiration(expiryDate)
                 .signWith(getSigningKey())
                 .compact();
     }

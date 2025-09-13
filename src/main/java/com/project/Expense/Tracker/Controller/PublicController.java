@@ -1,5 +1,7 @@
 package com.project.Expense.Tracker.Controller;
 
+import com.project.Expense.Tracker.Entity.DTO.AuthResponse;
+import com.project.Expense.Tracker.Entity.DTO.RefreshRequest;
 import com.project.Expense.Tracker.Exception.ApiErrorResponse;
 import com.project.Expense.Tracker.Entity.User;
 import com.project.Expense.Tracker.Exception.ResourceNotFoundException;
@@ -38,15 +40,14 @@ public class PublicController {
 
     @PostMapping("/sign-in")
     public ResponseEntity<?> signIn(@RequestBody User user){
-        try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUserName(),user.getPassword()));
-        } catch (Exception e) {
-            log.info("User Name : "+user.getUserName());
-            throw new ResourceNotFoundException("Username or password incorrect");
-        }
-        UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUserName());
-        String jwt = jwtUtils.generateToken(userDetails);
-        return new ResponseEntity<>(jwt, HttpStatus.OK);
+        AuthResponse authResponse = authService.signInService(user);
+        return new ResponseEntity<>(authResponse,HttpStatus.OK);
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refreshToken(@RequestBody RefreshRequest request) {
+        AuthResponse refresh = authService.refresh(request);
+        return new ResponseEntity<> (refresh,HttpStatus.OK);
     }
 
     @PostMapping("/sign-up")
